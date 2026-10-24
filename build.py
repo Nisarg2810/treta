@@ -44,8 +44,8 @@ RES = {r[0]: r for r in RESULTS}
 def ba(slug, label="", cls="", eager=False):
     r = RES[slug]
     ld = 'eager' if eager else 'lazy'
-    return (f'<div class="ba {cls}"><img src="assets/ba/{slug}-after.jpg" alt="{E(r[1])} after treatment at TRETĀ Derma" loading="{ld}" decoding="async" width="900" height="1000">'
-            f'<div class="b4"><img src="assets/ba/{slug}-before.jpg" alt="{E(r[1])} before treatment" loading="{ld}" decoding="async" width="900" height="1000"></div>'
+    return (f'<div class="ba {cls}"><img src="assets/ba/{slug}-after.jpg?v=4" alt="{E(r[1])} after treatment at TRETĀ Derma" loading="{ld}" decoding="async" width="900" height="1000">'
+            f'<div class="b4"><img src="assets/ba/{slug}-before.jpg?v=4" alt="{E(r[1])} before treatment" loading="{ld}" decoding="async" width="900" height="1000"></div>'
             f'<span class="tag l">Before</span><span class="tag r">After</span><span class="handle"></span>'
             f'<input type="range" min="0" max="100" value="50" aria-label="Compare before and after: {E(r[1])}"></div>')
 
@@ -406,7 +406,7 @@ def home():
 <p class="lead rv">A skin and hair institute in Maninagar, Ahmedabad, led by two MD dermatologists. Acne, pigmentation, hair loss and FUE hair transplant, treated with evidence, not guesswork.</p>
 <div class="hero-ctas rv d1"><a class="btn btn-white" href="book.html" data-book="">{CAL_SVG} Book a consultation</a><a class="btn glass" href="https://wa.me/{WA}" data-chat="">{WA_SVG} Chat on WhatsApp</a></div>
 <div class="hero-foot rv d2"><a class="rating-pill" href="{REVIEWS}" target="_blank" rel="noopener"><b>5.0</b><span><span class="stars" aria-hidden="true">★★★★★</span><small>101 reviews on Google</small></span></a>
-<a class="mini-res glass" href="results.html"><img src="assets/ba/ht-hairline-1-after.jpg" alt=""><span><small>Real patient results</small><b>See 13 before and afters →</b></span></a></div></div></section>
+<a class="mini-res glass" href="results.html"><img src="assets/ba/ht-hairline-1-after.jpg?v=4" alt=""><span><small>Real patient results</small><b>See 13 before and afters →</b></span></a></div></div></section>
 
 <div class="marquee" aria-hidden="true"><div class="track">{marq}</div></div>
 
