@@ -4,7 +4,7 @@ import json, os, html
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 BASE = "https://nisarg2810.github.io/treta/"
-V = "4"  # cache buster for site.css / site.js
+V = "7"  # cache buster for site.css / site.js
 PHONE, PHONE_D, WA = "+918511799700", "+91 85117 99700", "918511799700"
 IG, FB = "https://www.instagram.com/tretaderma/", "https://www.facebook.com/61562841763497"
 GMAPS = "https://www.google.com/maps/search/?api=1&query=Treta+Derma+Skin+and+Hair+Institute+Sigma+Esquire+Maninagar+Ahmedabad"
@@ -175,6 +175,17 @@ T = [
   results=["dpn"], faq="surg"),
 ]
 TBY = {t["slug"]: t for t in T}
+PHOTO = {"hair-transplant-ahmedabad": ("hair", "Man with full, natural hair"), "hair-loss-treatment": ("hairloss", "Healthy hair and scalp"),
+ "acne-scar-treatment": ("acne", "Clear skin after facial care"), "pigmentation-melasma-treatment": ("pigment", "Even, luminous skin tone"),
+ "laser-treatment-ahmedabad": ("laser", "Medical laser and skin device treatment"), "anti-ageing-hydrafacial": ("hydrafacial", "Hydrafacial treatment in progress"),
+ "chemical-peels": ("peel", "Chemical peel being applied"), "skin-disease-treatment": ("derm", "Dermatologist applying topical treatment"),
+ "mole-cyst-skin-tag-removal": ("procedure", "Minor skin procedure by a doctor")}
+def photo(slug, size="-s", cls=""):
+    f, alt = PHOTO[slug]
+    return f'<img src="assets/photo/{f}{size}.jpg" alt="{alt}" loading="lazy" decoding="async"{cls}>'
+def pcard(t, i, text):
+    return f'<a class="pcard rv d{i%3}" href="{t["slug"]}.html"><span class="ph">{photo(t["slug"])}</span><h3>{t["nav"]} <span class="arrow">→</span></h3><p>{text}</p></a>'
+
 
 FAQS = {
  "ht": [
@@ -296,7 +307,7 @@ def header(active):
     cur = lambda k: ' aria-current="page"' if k == active else ""
     sub = "".join(f'<a href="{t["slug"]}.html">{t["nav"]}</a>' for t in T)
     return f'''<a class="skip" href="#main">Skip to content</a>
-<header class="hdr"><div class="wrap">{BRAND}
+<header class="hdr{' over' if active == 'home' else ''}"><div class="wrap">{BRAND}
 <nav class="nav" aria-label="Main"><div class="dd"><button type="button" aria-expanded="false">Treatments</button><div class="dd-menu">{dd}</div></div>
 <a href="hair-transplant-ahmedabad.html"{cur("ht")}>Hair transplant</a><a href="results.html"{cur("results")}>Results</a><a href="doctors.html"{cur("doctors")}>Doctors</a><a href="./#faq">FAQ</a><a href="./#visit">Visit</a></nav>
 <div class="hdr-cta"><a class="icon-btn" href="tel:{PHONE}" aria-label="Call the clinic">{PHONE_SVG}</a><a class="btn btn-ink" href="book.html" data-book="">Book a visit <span class="arrow">→</span></a>
@@ -316,20 +327,21 @@ def footer():
 <dialog class="book" id="book-dialog" aria-label="Book a consultation"><div class="book-shell"></div></dialog>'''
 
 def page(fname, title, desc, body, active="", schema="", og_type="website"):
+    preload = '<link rel="preload" as="image" href="assets/photo/hero.jpg" imagesrcset="assets/photo/hero-m.jpg 1200w, assets/photo/hero.jpg 2800w" imagesizes="100vw">' if fname == "index.html" else ""
     url = BASE + ("" if fname == "index.html" else fname)
     icons_js = "window.TRETA_ICONS=" + json.dumps(ICONS) + ";"
     return f'''<!doctype html>
 <html lang="en-IN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>{E(title)}</title><meta name="description" content="{E(desc)}"><link rel="canonical" href="{url}">
-<meta name="robots" content="index,follow,max-image-preview:large"><meta name="theme-color" content="#F3EDE5">
+<meta name="robots" content="index,follow,max-image-preview:large"><meta name="theme-color" content="#F4F2EE">
 <meta name="geo.region" content="IN-GJ"><meta name="geo.placename" content="Maninagar, Ahmedabad">
 <meta property="og:type" content="{og_type}"><meta property="og:site_name" content="TRETĀ Derma"><meta property="og:locale" content="en_IN">
 <meta property="og:title" content="{E(title)}"><meta property="og:description" content="{E(desc)}"><meta property="og:url" content="{url}">
 <meta property="og:image" content="{BASE}assets/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{E(title)}"><meta name="twitter:description" content="{E(desc)}"><meta name="twitter:image" content="{BASE}assets/og.jpg">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="assets/logo-badge.png">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://api.fontshare.com"><link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>{preload}
+<link href="https://api.fontshare.com/v2/css?f[]=gambetta@300,301,400&f[]=general-sans@400,500,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/site.css?v={V}">
 {schema}
 </head><body>
@@ -372,14 +384,14 @@ def results_grid(slugs, gid="res-grid", filters=True):
 # ------------------------------------------------------------------ home
 def home():
     marq = "".join(f"<span>{w}</span>" for w in ["Acne", "Acne scars", "Melasma", "Hair transplant", "PRP and GFC", "Chemical peels", "Laser hair reduction", "Hydrafacial", "Alopecia", "Vitiligo", "Anti-ageing", "Tattoo removal"]) * 2
-    disc = [("01","Skin","Acne, pigmentation, eczema, vitiligo and every everyday concern.","skin-disease-treatment","acne-scars"),
-            ("02","Anti-ageing","Hydrafacial, fillers and tightening that look natural.","anti-ageing-hydrafacial","chemical-peel"),
-            ("03","Lasers","Hair reduction, tattoo removal, toning and scar lasers.","laser-treatment-ahmedabad","melasma"),
-            ("04","Hair transplant","FUE and DHI, planned and performed by a dermatologist.","hair-transplant-ahmedabad","ht-hairline-3")]
-    disc_html = "".join(f'<a href="{u}.html" class="rv"><span class="n">{n}</span><span class="t">{t}</span><span class="d">{d}</span><span class="go" aria-hidden="true">→</span><span class="peek" aria-hidden="true"><img src="assets/ba/{img}-after.jpg" alt="" loading="lazy"></span></a>' for n, t, d, u, img in disc)
+    disc = [("01","Skin","Acne, pigmentation, eczema, vitiligo and every everyday concern.","skin-disease-treatment","acne"),
+            ("02","Anti-ageing","Hydrafacial, fillers and tightening that look natural.","anti-ageing-hydrafacial","hydrafacial"),
+            ("03","Lasers","Hair reduction, tattoo removal, toning and scar lasers.","laser-treatment-ahmedabad","laser"),
+            ("04","Hair transplant","FUE and DHI, planned and performed by a dermatologist.","hair-transplant-ahmedabad","hair")]
+    disc_html = "".join(f'<a href="{u}.html" class="rv"><span class="n">{n}</span><span class="t">{t}</span><span class="d">{d}</span><span class="go" aria-hidden="true">→</span><span class="peek" aria-hidden="true"><img src="assets/photo/{img}-s.jpg" alt="" loading="lazy"></span></a>' for n, t, d, u, img in disc)
     tabs = "".join(f'<button type="button" class="tab" role="tab" id="tab-{i}" aria-controls="pn-{i}" aria-selected="{str(i==0).lower()}" tabindex="{0 if i==0 else -1}">{c}<span>{len(items)}</span></button>' for i, (c, s, items) in enumerate(FACILITIES))
     panels = "".join(f'<div class="panel{" on" if i==0 else ""}" id="pn-{i}" role="tabpanel" aria-labelledby="tab-{i}"><h3 class="h3">{s}</h3><div class="pills">' + "".join(f'<a class="pill" href="{u}.html">{n} <span class="arrow">→</span></a>' for n, u in items) + "</div></div>" for i, (c, s, items) in enumerate(FACILITIES))
-    cards = "".join(f'<a class="card rv d{i%3}" href="{t["slug"]}.html"><span class="ic" aria-hidden="true">{ICONS[t["icon"]]}</span><h3>{t["nav"]}</h3><p>{t["short"]}.</p><span class="more">Learn more <span class="arrow">→</span></span></a>' for i, t in enumerate(T))
+    cards = "".join(pcard(t, i, t["short"] + ".") for i, t in enumerate(T))
     stages = [dict(t="Day 1", d="Grafts are placed in one sitting under local anaesthesia. You go home the same evening.", len=6, keep=1),
               dict(t="Weeks 2 to 6", d="Transplanted hairs shed. This is normal and expected, the roots stay safely in place.", len=3, keep=.35),
               dict(t="Month 3", d="New, fine hair starts to grow through, slowly at first.", len=22, keep=.7),
@@ -388,16 +400,13 @@ def home():
     ticks = "".join(f'<button type="button">{s["t"]}</button>' for s in stages)
     quotes = "".join(f'<figure class="quote rv d{i}" style="margin:0"><span class="stars" aria-label="5 stars">★★★★★</span><p>“{q}”</p><small>{s}</small></figure>' for i, (q, s) in enumerate(THEMES))
     body = f'''
-<section class="hero"><div class="wrap hero-grid"><div>
-<span class="status" data-status></span>
-<h1 class="display split">Clear skin.<br>Fuller hair.<br><em>Chosen wisely.</em></h1>
-<p class="lead rv">TRETĀ Derma is a skin and hair institute in Maninagar, Ahmedabad, led by two MD dermatologists. Acne, pigmentation, hair loss and FUE hair transplant, treated with evidence, not guesswork.</p>
-<div class="hero-ctas rv d1"><a class="btn btn-ink" href="book.html" data-book="">{CAL_SVG} Book a consultation</a><a class="btn btn-line" href="https://wa.me/{WA}" data-chat="">{WA_SVG} Chat on WhatsApp</a></div>
-<div class="hero-meta rv d2"><a class="rating-pill" href="{REVIEWS}" target="_blank" rel="noopener"><b>5.0</b><span><span class="stars" aria-hidden="true">★★★★★</span><small>101 reviews on Google</small></span></a>
-<span class="muted small" style="max-width:26ch">Dr. Sohini Soneji Shah and Dr. Malhar Shah, MD Dermatology</span></div></div>
-<div class="hero-art rv d2">{ba("ht-hairline-1", cls="arch", eager=True)}
-<div class="seal" aria-hidden="true"><svg viewBox="0 0 120 120"><defs><path id="c" d="M60 60m-46 0a46 46 0 1 1 92 0a46 46 0 1 1-92 0"/></defs><text font-family="Manrope" font-size="9.6" font-weight="700" fill="#15120F" textLength="286" lengthAdjust="spacing"><textPath href="#c">BE WISE · CHOOSE RIGHT · BE WISE · CHOOSE RIGHT ·</textPath></text></svg><span class="core">TRETĀ</span></div>
-<div class="cap"><span><b>Hair transplant, FUE</b> · 6 months</span><span>Drag to compare</span></div></div></div></section>
+<section class="hero-full"><picture><source media="(max-width:760px)" srcset="assets/photo/hero-m.jpg"><img class="hero-img" src="assets/photo/hero.jpg" alt="Woman with healthy, glowing skin in warm sunlight" fetchpriority="high" width="2800" height="1867"></picture>
+<div class="wrap"><span class="status" data-status></span>
+<h1 class="display split">Skin and hair,<br><em>chosen wisely.</em></h1>
+<p class="lead rv">A skin and hair institute in Maninagar, Ahmedabad, led by two MD dermatologists. Acne, pigmentation, hair loss and FUE hair transplant, treated with evidence, not guesswork.</p>
+<div class="hero-ctas rv d1"><a class="btn btn-white" href="book.html" data-book="">{CAL_SVG} Book a consultation</a><a class="btn glass" href="https://wa.me/{WA}" data-chat="">{WA_SVG} Chat on WhatsApp</a></div>
+<div class="hero-foot rv d2"><a class="rating-pill" href="{REVIEWS}" target="_blank" rel="noopener"><b>5.0</b><span><span class="stars" aria-hidden="true">★★★★★</span><small>101 reviews on Google</small></span></a>
+<a class="mini-res glass" href="results.html"><img src="assets/ba/ht-hairline-1-after.jpg" alt=""><span><small>Real patient results</small><b>See 13 before and afters →</b></span></a></div></div></section>
 
 <div class="marquee" aria-hidden="true"><div class="track">{marq}</div></div>
 
@@ -421,13 +430,14 @@ def home():
 <div style="margin-top:44px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap"><p class="res-note" style="margin:0">Individual results vary. Photos used with patient consent.</p><a class="btn btn-line" href="results.html">See all 13 results <span class="arrow">→</span></a></div></div></section>
 
 <section class="sec paper" id="treatments"><div class="wrap"><div class="sec-hd"><div><span class="eyebrow">Signature treatments</span><h2 class="h2 split">Care that is<br><em>specific to you.</em></h2></div>
-<p class="lead rv">Every plan starts with a diagnosis. Here is where most of our patients begin.</p></div><div class="cards">{cards}</div></div></section>
+<p class="lead rv">Every plan starts with a diagnosis. Here is where most of our patients begin.</p></div><div class="pcards">{cards}</div></div></section>
 
 <section class="sec" id="doctors"><div class="wrap"><div class="sec-hd"><div><span class="eyebrow">Your doctors</span><h2 class="h2 split">Two specialists.<br><em>Every single visit.</em></h2></div>
 <p class="lead rv">You are always seen by an MD dermatologist, never handed to a technician for diagnosis.</p></div>{doctors_block()}</div></section>
 
 <section class="sec ink"><div class="wrap"><div class="sec-hd"><div><span class="eyebrow">Your first visit</span><h2 class="h2 split">Simple from<br><em>the first message.</em></h2></div>
 <p class="lead rv">No pressure, no package selling. A clear diagnosis and a plan you understand.</p></div>
+<div class="photo-band rv" style="margin:0 0 clamp(40px,6vw,70px)"><img src="assets/photo/glow-s.jpg" alt="Calm, clean treatment room experience" loading="lazy"></div>
 <div class="steps"><div class="step rv"><h3>Reach out</h3><p>Book online in a minute or message us on WhatsApp. Photos help.</p></div>
 <div class="step rv d1"><h3>Consult</h3><p>Your dermatologist examines your skin or scalp and finds the cause.</p></div>
 <div class="step rv d2"><h3>Plan</h3><p>A written plan with sessions, timelines and what to expect at each step.</p></div>
@@ -471,7 +481,7 @@ def treatment(t):
 <section class="phero"><div class="wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="./">Home</a><span>/</span><a href="treatments.html">Treatments</a><span>/</span><span aria-current="page">{t["nav"]}</span></nav>
 <div class="phero-grid"><div><h1 class="display split">{t["h1"]}</h1><p class="lead rv">{t["lead"]}</p>
 <div class="hero-ctas rv d1" style="margin-top:30px"><a class="btn btn-ink" href="book.html" data-book="">{CAL_SVG} Book a consultation</a><a class="btn btn-line" href="https://wa.me/{WA}" data-chat="">{WA_SVG} Ask on WhatsApp</a></div></div>
-<div class="glance rv d2">{glance}</div></div></div></section>
+<div class="phero-img rv d2">{photo(t["slug"], "")}</div></div><div class="glance strip rv">{glance}</div></div></section>
 <section class="sec paper"><div class="wrap two"><div><span class="eyebrow">What we treat</span><h2 class="h2 split" style="margin:16px 0 30px">Common reasons<br><em>people come in.</em></h2><ul class="ticks rv">{treats}</ul></div>
 <div><span class="eyebrow">How it works</span><div class="prose rv" style="margin:16px 0 26px"><p>{t["body"]}</p></div><div class="how">{how}</div></div></div></section>
 {res}
@@ -484,12 +494,12 @@ def treatment(t):
     return page(t["slug"] + ".html", t["title"], t["desc"], body, "ht" if t["slug"].startswith("hair-transplant") else "", schema, "article")
 
 def treatments_hub():
-    cards = "".join(f'<a class="card rv d{i%3}" href="{t["slug"]}.html"><span class="ic" aria-hidden="true">{ICONS[t["icon"]]}</span><h3>{t["nav"]}</h3><p>{t["lead"]}</p><span class="more">Learn more <span class="arrow">→</span></span></a>' for i, t in enumerate(T))
+    cards = "".join(pcard(t, i, t["short"] + ".") for i, t in enumerate(T))
     allf = "".join(f'<div class="rv" style="margin-bottom:34px"><h3 class="h3" style="margin-bottom:16px">{c} <span class="muted small" style="font-family:var(--sans)">{s}</span></h3><div class="pills">' + "".join(f'<a class="pill" href="{u}.html">{n}</a>' for n, u in items) + "</div></div>" for c, s, items in FACILITIES)
     body = f'''<section class="phero"><div class="wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="./">Home</a><span>/</span><span aria-current="page">Treatments</span></nav>
 <div class="phero-grid"><div><h1 class="display split">Every treatment,<br><em>under one roof.</em></h1><p class="lead rv">Skin, anti-ageing, lasers, hair and minor surgery. More than 60 treatments, all planned by MD dermatologists in Maninagar, Ahmedabad.</p></div>
 <div class="rv d1"><a class="btn btn-ink" href="book.html" data-book="">{CAL_SVG} Book a consultation</a></div></div></div></section>
-<section class="sec paper" style="padding-top:80px"><div class="wrap"><div class="cards">{cards}</div></div></section>
+<section class="sec paper" style="padding-top:80px"><div class="wrap"><div class="pcards">{cards}</div></div></section>
 <section class="sec"><div class="wrap"><div class="sec-hd"><div><span class="eyebrow">Full menu</span><h2 class="h2 split">The complete<br><em>list.</em></h2></div><p class="lead rv">Tap any treatment to learn how it works.</p></div>{allf}</div></section>{cta_block()}'''
     schema = ld(CLINIC, crumbs_ld([("Home", ""), ("Treatments", "treatments.html")]))
     return page("treatments.html", "Skin, Hair and Laser Treatments in Ahmedabad | TRETĀ Derma", "All skin, hair, laser, anti-ageing and minor surgical treatments at TRETĀ Derma, Maninagar, Ahmedabad. Planned by MD dermatologists.", body, "", schema)
